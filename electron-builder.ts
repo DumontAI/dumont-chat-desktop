@@ -111,6 +111,7 @@ const config = {
         executableArgs: [' '],
     },
     mac: {
+        artifactName: '${version}/${productName}-${version}-${arch}.${ext}',
         category: 'public.app-category.productivity',
         target: [
             'zip',
@@ -152,23 +153,24 @@ const config = {
         provisioningProfile: './dev.provisionprofile',
     },
     dmg: {
-        background: 'src/assets/osx/DMG_BG.png',
+        background: 'src/assets/osx/DMG_BG.tiff',
         contents: [
             {
-                x: 135,
-                y: 165,
+                x: 180,
+                y: 230,
             },
             {
-                x: 407,
-                y: 165,
+                x: 480,
+                y: 230,
                 type: 'link',
                 path: '/Applications',
             },
         ],
-        iconSize: 120,
+        iconSize: 100,
         iconTextSize: 14,
         window: {
-            height: 380,
+            width: 660,
+            height: 400,
         },
     },
     win: {
