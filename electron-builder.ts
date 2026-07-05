@@ -19,7 +19,7 @@ function getMacVersions() {
 }
 
 const config = {
-    appId: 'Mattermost.Desktop',
+    appId: 'ai.getdumont.chat',
     artifactName: '${version}/${name}-${version}-${os}-${arch}.${ext}',
     directories: {
         buildResources: 'src/assets',
@@ -89,7 +89,7 @@ const config = {
             'rpm',
             'flatpak',
         ],
-        appId: 'com.Mattermost.Desktop',
+        appId: 'ai.getdumont.chat',
         extraFiles: [
             {
                 filter: [
@@ -132,7 +132,7 @@ const config = {
         extendInfo: {
             NSMicrophoneUsageDescription: 'Microphone access is used to capture audio for voice communication and recordings.',
             NSCameraUsageDescription: 'Camera access is used to capture video for video conferencing and recordings.',
-            NSFocusStatusUsageDescription: 'Focus status is used by Mattermost to determine whether to send notifications or not.',
+            NSFocusStatusUsageDescription: 'Focus status is used by Dumont Chat to determine whether to send notifications or not.',
             LSFileQuarantineEnabled: true,
         },
         ...getMacVersions(),
@@ -210,6 +210,17 @@ const config = {
         useWaylandFlags: true,
     },
 };
+
+// Dumont: unsigned local builds (no Apple Developer cert yet).
+// Restricted entitlements + hardened runtime break ad-hoc-signed launches, so strip them.
+// Usage: NO_CODESIGN=1 CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac dmg zip --arm64 --publish=never
+if (process.env.NO_CODESIGN) {
+    // note: identity stays unset so electron-builder falls back to ad-hoc signing (arm64 requires a signature)
+    config.mac.hardenedRuntime = false;
+    config.mac.gatekeeperAssess = false;
+    delete config.mac.entitlements;
+    delete config.mac.entitlementsInherit;
+}
 
 if (process.env.CI_MAC_ZIP_ONLY) {
     config.mac.target = ['zip'];
