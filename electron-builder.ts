@@ -153,15 +153,16 @@ const config = {
         provisioningProfile: './dev.provisionprofile',
     },
     dmg: {
+        title: 'Dumont Chat',
         background: 'src/assets/osx/DMG_BG.tiff',
         contents: [
             {
                 x: 180,
-                y: 230,
+                y: 190,
             },
             {
                 x: 480,
-                y: 230,
+                y: 190,
                 type: 'link',
                 path: '/Applications',
             },
