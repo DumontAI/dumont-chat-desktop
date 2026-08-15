@@ -34,11 +34,17 @@ const buildConfig: BuildConfig = {
     upgradeLink: DEFAULT_UPGRADE_LINK,
     enableServerManagement: true,
     enableUpdateNotifications: true,
-    updateNotificationURL: 'https://releases.mattermost.com/desktop',
-    macAppStoreUpdateURL: 'macappstore://apps.apple.com/us/app/mattermost-desktop/id1614666244',
-    windowsStoreUpdateURL: 'ms-windows-store://pdp/?productid=XP8BR8MH3LPKLT',
-    linuxUpdateURL: 'https://docs.mattermost.com/deployment-guide/desktop/linux-desktop-install.html',
-    linuxGitHubReleaseURL: 'https://github.com/mattermost/desktop/releases/tag/v',
+    // Version feed: a plain text file, <url>/latest.txt, holding the newest
+    // version string. Served from the dumont.au static site. Upstream pointed
+    // this at releases.mattermost.com, so accepting an update installed stock
+    // Mattermost and silently reverted every bit of branding.
+    updateNotificationURL: 'https://dumont.au/desktop',
+    // We ship a direct DMG, not a Mac App Store build. Upstream sent macOS users
+    // to Mattermost Desktop's App Store listing.
+    macAppStoreUpdateURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases',
+    windowsStoreUpdateURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases',
+    linuxUpdateURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases',
+    linuxGitHubReleaseURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases/tag/v',
     managedResources: ['trusted'],
     allowedProtocols: [
         'mattermost',
