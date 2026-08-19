@@ -10,7 +10,15 @@
 	<true/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
-	<key>com.apple.developer.usernotifications.communication</key>
-	<true/>
+	<!--
+	  com.apple.developer.usernotifications.communication is deliberately absent.
+	  It is a restricted entitlement that only takes effect with a provisioning
+	  profile granting the Communication Notifications capability. Upstream ships
+	  one; our Developer ID build does not, and macOS then refuses to spawn the
+	  process at all: "Launchd job spawn failed", NSPOSIXErrorDomain code 163.
+	  The signature and Gatekeeper both pass, so the only symptom is that the app
+	  will not open. Notifications still work without it; the entitlement only
+	  gives them the person-to-person presentation style.
+	-->
 </dict>
 </plist>
