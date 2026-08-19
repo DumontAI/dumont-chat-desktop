@@ -26,7 +26,9 @@ const buildConfig: BuildConfig = {
     defaultServers: [
         {
             name: 'Dumont Chat',
-            url: 'https://chat.getdumont.ai',
+            // Official host since 2026-08-19. chat.getdumont.ai still 301s here
+            // for builds older than 6.2.2-dumont.3, but new installs come straight.
+            url: 'https://app.dumont.chat',
         },
     ],
     helpLink: DEFAULT_HELP_LINK,
