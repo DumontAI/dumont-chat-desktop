@@ -5,8 +5,9 @@
 #   DumontChat-<v>-{arm64,intel}.dmg        the human download
 #   DumontChat-latest-{arm64,intel}.dmg     the stable links we hand out
 #   <v>/DumontChat-<v>-mac-{arm64,x64}.dmg  what the in-app updater fetches
-# plus the legacy mattermost-desktop-<v>-mac-<arch>.dmg shape, because installs
-# older than 6.2.5 build that URL and 404 without it.
+# The old brand appears in no served path. Installs older than 6.2.5 have the
+# legacy URL compiled in and will 404 on their update button; they need one
+# manual download from the latest- link, after which they self-update.
 #
 # Usage: publish-desktop.sh <version>
 set -euo pipefail
@@ -30,16 +31,13 @@ sudo ln -sfn DumontChat-$V-intel.dmg $D/DumontChat-latest-intel.dmg
 sudo mkdir -p $D/$V
 sudo ln -sfn ../DumontChat-$V-arm64.dmg $D/$V/DumontChat-$V-mac-arm64.dmg
 sudo ln -sfn ../DumontChat-$V-intel.dmg $D/$V/DumontChat-$V-mac-x64.dmg
-sudo ln -sfn ../DumontChat-$V-arm64.dmg $D/$V/mattermost-desktop-$V-mac-arm64.dmg
-sudo ln -sfn ../DumontChat-$V-intel.dmg $D/$V/mattermost-desktop-$V-mac-x64.dmg
 printf '%s' '$V' | sudo tee $D/latest.txt > /dev/null
 "
 rm -f "/tmp/DumontChat-$V-arm64.dmg" "/tmp/DumontChat-$V-intel.dmg"
 
 echo "=== published, verifying every URL the app or a human can hit"
 for u in "DumontChat-latest-arm64.dmg" "DumontChat-latest-intel.dmg" \
-         "$V/DumontChat-$V-mac-arm64.dmg" "$V/DumontChat-$V-mac-x64.dmg" \
-         "$V/mattermost-desktop-$V-mac-arm64.dmg" "$V/mattermost-desktop-$V-mac-x64.dmg"; do
+         "$V/DumontChat-$V-mac-arm64.dmg" "$V/DumontChat-$V-mac-x64.dmg"; do
     printf '  %-46s ' "$u"
     curl -sI -A dumont-agent "https://dumont.au/desktop/$u" | head -1 | tr -d '\r'
 done
