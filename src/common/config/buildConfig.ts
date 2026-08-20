@@ -48,6 +48,10 @@ const buildConfig: BuildConfig = {
     linuxUpdateURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases',
     linuxGitHubReleaseURL: 'https://github.com/DumontAI/dumont-chat-desktop/releases/tag/v',
     managedResources: ['trusted'],
+    // Dumont Auth (ZITADEL). Clicking the SSO button navigates to the server's
+    // /oauth/gitlab/login, which 302s here; without this the will-navigate
+    // guard blocks it and the button appears to do nothing at all.
+    trustedNavigationOrigins: ['https://auth.getdumont.ai'],
     allowedProtocols: [
         'mattermost',
         'ftp',

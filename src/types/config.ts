@@ -136,6 +136,14 @@ export type BuildConfig = {
     linuxGitHubReleaseURL: string;
     managedResources: string[];
     allowedProtocols: string[];
+
+    /**
+     * Origins the app may navigate to even though they are not the server.
+     * Needed for SSO: the identity provider lives on a different host, and the
+     * will-navigate guard otherwise blocks the redirect and login silently
+     * does nothing. Keep this to identity providers we operate.
+     */
+    trustedNavigationOrigins: string[];
 }
 
 export type RegistryConfig = {

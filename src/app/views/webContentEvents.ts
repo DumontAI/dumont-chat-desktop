@@ -10,6 +10,7 @@ import NavigationManager from 'app/navigationManager';
 import PluginsPopUpsManager from 'app/views/pluginsPopUps';
 import WebContentsManager from 'app/views/webContentsManager';
 import Config from 'common/config';
+import buildConfig from 'common/config/buildConfig';
 import {Logger} from 'common/log';
 import ServerManager from 'common/servers/serverManager';
 import {
@@ -23,6 +24,7 @@ import {
     isManagedResource,
     isPluginUrl,
     isPublicFilesUrl,
+    isSSOUrl,
     isTeamUrl,
     parseURL,
 } from 'common/utils/url';
@@ -120,6 +122,20 @@ export class WebContentsEventManager {
                     this.log(webContentsId).warn('Error handling custom protocol dialog', err);
                 });
                 event.preventDefault();
+                return;
+            }
+
+            // SSO leaves the server by design: /oauth/gitlab/login 302s to the
+            // identity provider and comes back to /signup/gitlab/complete.
+            // Both of those live under nonTeamUrlPaths, so allow them on our
+            // own server, and allow the identity provider origin itself.
+            // Without all three the login button silently does nothing.
+            if (serverURL && isSSOUrl(serverURL, parsedURL)) {
+                return;
+            }
+
+            if (buildConfig.trustedNavigationOrigins?.includes(parsedURL.origin)) {
+                this.log(webContentsId).debug('Allowing navigation to trusted auth origin');
                 return;
             }
 

@@ -87,6 +87,17 @@ export const isAdminUrl = (serverURL: URL, inputURL: URL) => isUrlType('admin_co
 export const isPluginUrl = (serverURL: URL, inputURL: URL) => isUrlType('plugins', serverURL, inputURL);
 export const isChannelExportUrl = (serverURL: URL, inputURL: URL) => isUrlType('plugins/com.mattermost.plugin-channel-export/api/v1/export', serverURL, inputURL);
 export const isMagicLinkUrl = (serverURL: URL, inputURL: URL) => isUrlType('login/one_time_link', serverURL, inputURL);
+
+/**
+ * The two paths on our own server that an SSO round trip goes through.
+ * Both 'oauth' and 'signup' sit in nonTeamUrlPaths, so isTeamUrl rejects them
+ * and the will-navigate guard blocks the login before it ever leaves for the
+ * identity provider. Upstream avoids this by driving SSO through the external
+ * browser with a desktop token; we navigate in place instead, so these have to
+ * be allowed explicitly.
+ */
+export const isSSOUrl = (serverURL: URL, inputURL: URL) =>
+    isUrlType('oauth', serverURL, inputURL) || isUrlType('signup', serverURL, inputURL);
 export const isManagedResource = (serverURL: URL, inputURL: URL) => [...buildConfig.managedResources].some((testPath) => isUrlType(testPath, serverURL, inputURL));
 export const isTeamUrl = (serverURL: URL, inputURL: URL, withApi?: boolean) => {
     if (!isInternalURL(inputURL, serverURL)) {
