@@ -39,9 +39,24 @@ import {composeUserAgent} from '../../main/utils';
 
 const log = new Logger('WebContentsEventManager');
 
+// How long an SSO chain may wander off-server after the user starts a login.
+const SSO_FLOW_WINDOW_MS = 5 * 60 * 1000;
+
 export class WebContentsEventManager {
     listeners: Record<number, () => void>;
     popupWindow?: {win: BrowserWindow; serverURL?: URL; contextMenu?: ContextMenu};
+
+    /**
+     * Timestamp until which an SSO round trip is considered in flight.
+     *
+     * An OAuth chain is not a fixed set of hosts: Dumont Auth may hand off to
+     * Google or Microsoft, and those bounce through hosts of their own. An
+     * allowlist of identity provider origins therefore breaks every time a new
+     * provider or redirect appears, which it already did twice. Instead, opening
+     * a bounded window when the user deliberately starts a login lets the whole
+     * chain complete, and it closes the moment we are back on the server.
+     */
+    private ssoFlowUntil = 0;
 
     constructor() {
         this.listeners = {};
@@ -101,6 +116,9 @@ export class WebContentsEventManager {
             const serverURL = this.getServerURLFromWebContentsId(webContentsId);
 
             if (serverURL && (isTeamUrl(serverURL, parsedURL) || isAdminUrl(serverURL, parsedURL) || isLoginUrl(serverURL, parsedURL) || this.isTrustedPopupWindow(webContentsId))) {
+                if (isInternalURL(parsedURL, serverURL)) {
+                    this.ssoFlowUntil = 0;
+                }
                 return;
             }
 
@@ -131,11 +149,17 @@ export class WebContentsEventManager {
             // own server, and allow the identity provider origin itself.
             // Without all three the login button silently does nothing.
             if (serverURL && isSSOUrl(serverURL, parsedURL)) {
+                this.ssoFlowUntil = Date.now() + SSO_FLOW_WINDOW_MS;
                 return;
             }
 
             if (buildConfig.trustedNavigationOrigins?.includes(parsedURL.origin)) {
                 this.log(webContentsId).debug('Allowing navigation to trusted auth origin');
+                return;
+            }
+
+            if (Date.now() < this.ssoFlowUntil) {
+                this.log(webContentsId).debug('Allowing navigation: SSO round trip in flight');
                 return;
             }
 
