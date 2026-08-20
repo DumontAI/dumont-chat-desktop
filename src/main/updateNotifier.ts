@@ -237,7 +237,11 @@ export class UpdateNotifier {
     };
 
     private getDownloadURL = (version: string, platformName: string, fileExt: string, archName: string): string => {
-        return `mattermost-desktop-${version}-${platformName}-${archName}.${fileExt}`;
+        // Dumont artefact naming. Upstream built mattermost-desktop-<...>, which
+        // both 404s against our release feed and puts the old brand in a URL the
+        // user sees. deploy/publish-desktop.sh keeps serving the old shape too,
+        // because installs older than 6.2.5 still ask for it.
+        return `DumontChat-${version}-${platformName}-${archName}.${fileExt}`;
     };
 
     private skipVersion = (): void => {
